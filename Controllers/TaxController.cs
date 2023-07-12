@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Tax.Controllers
 {
@@ -40,6 +41,7 @@ namespace Tax.Controllers
                     Name = "Transaction-ID",
                     Description = "Transaction-12345"
                 }},
+                Currency = "EUR",
                 VoucherDate = DateTime.Now
             };
 
@@ -55,9 +57,9 @@ namespace Tax.Controllers
 
         [HttpGet]
         [Route("/getLastInvoices")]
-        public async Task<List<VoucherSearchResponse>> Get()
+        public async Task<IEnumerable<VoucherSearchResponse>> Get()
         {
-            return await taxService.getLastInvoices();
+            return await taxService.getInvoicesForVoucherDay(DateTime.Now);
         }
     }
 }
