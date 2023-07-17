@@ -18,48 +18,31 @@ namespace Tax.Controllers
         }
 
         [HttpPost]
-        [Route("/createTestInvoice")]
+        [Route("/createTestVoucher")]
         public async void Post()
         {
-            Invoice invoice = new Invoice()
+            Voucher voucher = new Voucher()
             {
-                Address = new Address()
-                {
-                    Name = "User-1234",
-                    Zip = "00000",
-                    CountryCode = "DE"
-                },
-                Items = new InvoiceItem[]{new CustomInvoiceItem(){
-                    Name = "1.800 CoflCoins - PayPal",
-                    Quantity = 1,
-                    UnitPrice = new UnitPrice(){
-                        Currency = "EUR",
-                        GrossAmount = 6.99m,
-                        TaxRatePercentage = 19
-                    }
-                }, new TextInvoiceItem(){
-                    Name = "Transaction-ID",
-                    Description = "Transaction-12345"
-                }},
-                Currency = "EUR",
-                VoucherDate = DateTime.Now
+                VoucherDate = DateTime.Now,
+                VoucherNumber = "4CT305673G2411545",
+                VoucherItems = new List<VoucherItem>(){
+                new VoucherItem(){
+                    Amount = 6.99m,
+                    CategoryId = CategoryID.Dienstleistungen,
+                    TaxRatePercent = 19
+                }
+               },
+                Remark = "1.800 CoflCoins"
             };
 
             try
             {
-                await taxService.createLexOfficeInvoice(invoice);
+                await taxService.createLexOfficeInvoice(voucher);
             }
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex.GetBaseException(), "Error while posting invoice to lexoffice");
             }
-        }
-
-        [HttpGet]
-        [Route("/getLastInvoices")]
-        public async Task<IEnumerable<VoucherSearchResponse>> Get()
-        {
-            return await taxService.getInvoicesForVoucherDay(DateTime.Now);
         }
     }
 }

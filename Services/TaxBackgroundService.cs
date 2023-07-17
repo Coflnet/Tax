@@ -19,28 +19,17 @@ public class TaxBackgroundService : BackgroundService
     {
         await consumer.Consume<PaymentEvent>(config["KAFKA:PAYMENT_TOPIC:NAME"], async (paymentEvent) =>
         {
-            await taxService.createLexOfficeInvoice(new Invoice()
+            await taxService.createLexOfficeInvoice(new Voucher()
             {
-                Address = new Address()
-                {
-                    Name = paymentEvent.UserId,
-                    Zip = paymentEvent.PostalCode,
-                    CountryCode = paymentEvent.CountryCode,
-                },
-                Items = new InvoiceItem[]{new CustomInvoiceItem(){
-                    Name = $"{paymentEvent.ProductId} - {paymentEvent.PaymentMethod}",
-                    Quantity = 1,
-                    UnitPrice = new UnitPrice(){
-                        Currency = paymentEvent.Currency,
-                        GrossAmount = (decimal) paymentEvent.PayedAmount,
-                        TaxRatePercentage = paymentEvent.CountryCode.Equals("DE") ? 19 : 0
-                    },
+                VoucherNumber = $"{paymentEvent.ProductId} - {paymentEvent.PaymentMethod}",
+                VoucherItems = new List<VoucherItem>(){new VoucherItem(){
+                    Amount = (decimal) paymentEvent.PayedAmount,
+                    CategoryId = CategoryID.Dienstleistungen,
+                    TaxRatePercent = paymentEvent.CountryCode == "DE" ? 19 : 0,
 
-                }, new TextInvoiceItem(){
-                    Name = "Transaction-ID",
-                    Description = paymentEvent.PaymentProviderTransactionId
                 }},
-                VoucherDate = paymentEvent.Timestamp
+                VoucherDate = paymentEvent.Timestamp,
+                Remark = paymentEvent.ProductId
             });
         }, stoppingToken);
     }
