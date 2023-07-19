@@ -24,7 +24,7 @@ namespace Tax.Controllers
             Voucher voucher = new Voucher()
             {
                 VoucherDate = DateTime.Now,
-                VoucherNumber = "4CT305673G2411545",
+                VoucherNumber = "Vouchernumber-1234",
                 VoucherItems = new List<VoucherItem>(){
                 new VoucherItem(){
                     Amount = 6.99m,

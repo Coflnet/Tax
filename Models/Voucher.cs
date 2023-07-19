@@ -20,6 +20,7 @@ namespace Tax
             }
         }
         public Boolean UseCollectiveContact { get; set; } = true;
+        public string? ContactId { get; set; }
         public string TaxType { get; set; } = "gross";
         public required List<VoucherItem> VoucherItems { get; set; } = new List<VoucherItem>();
         public required string Remark { get; set; }

@@ -19,6 +19,12 @@ public class TaxBackgroundService : BackgroundService
     {
         await consumer.Consume<PaymentEvent>(config["KAFKA:PAYMENT_TOPIC:NAME"], async (paymentEvent) =>
         {
+            string? contactId = await taxService.findCustomerContact("test@test.de");
+            if (contactId is null)
+            {
+                contactId = await taxService.createCustomerContact("test", "tester", "test@test.de");
+            }
+
             await taxService.createLexOfficeInvoice(new Voucher()
             {
                 VoucherNumber = $"{paymentEvent.ProductId} - {paymentEvent.PaymentMethod}",
@@ -28,6 +34,8 @@ public class TaxBackgroundService : BackgroundService
                     TaxRatePercent = paymentEvent.CountryCode == "DE" ? 19 : 0,
 
                 }},
+                UseCollectiveContact = false,
+                ContactId = contactId,
                 VoucherDate = paymentEvent.Timestamp,
                 Remark = paymentEvent.ProductId
             });
