@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -76,10 +75,17 @@ public class TaxService
                 person = new
                 {
                     firstName = name,
-                    lastname = lastname,
+                    lastName = lastname,
                 },
-                version = "0",
-                emailAddresses = email
+                version = 0,
+                roles = new
+                {
+                    customer = new { }
+                },
+                emailAddresses = new
+                {
+                    @private = new string[] { email }
+                }
             };
             var serializerSettings = new JsonSerializerSettings();
             serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -88,7 +94,7 @@ public class TaxService
             string? token = config["LEX_OFFICE_TOKEN"];
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
             client.DefaultRequestHeaders.Add("Accept", "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://api.lexoffice.io/v1/vouchers", content);
+            HttpResponseMessage response = await client.PostAsync("https://api.lexoffice.io/v1/contacts", content);
             response.EnsureSuccessStatusCode();
             string responseContent = await response.Content.ReadAsStringAsync();
             JObject jsonObject = JObject.Parse(responseContent);

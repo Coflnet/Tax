@@ -21,6 +21,11 @@ namespace Tax.Controllers
         [Route("/createTestVoucher")]
         public async void Post()
         {
+            string? contactId = await taxService.findCustomerContact("blub@test.de");
+            if (contactId is null)
+            {
+                contactId = await taxService.createCustomerContact("test", "tester", "blub@test.de");
+            }
             Voucher voucher = new Voucher()
             {
                 VoucherDate = DateTime.Now,
@@ -32,7 +37,9 @@ namespace Tax.Controllers
                     TaxRatePercent = 19
                 }
                },
-                Remark = "1.800 CoflCoins"
+                Remark = "1.800 CoflCoins",
+                ContactId = contactId,
+                UseCollectiveContact = false
             };
 
             try
