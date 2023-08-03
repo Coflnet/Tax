@@ -2,7 +2,7 @@ namespace Tax
 {
     public class Voucher
     {
-        public string Type { get; set; } = "salesinvoice";
+        public required string Type { get; set; }
         public required string VoucherNumber { get; set; }
         public required DateTime VoucherDate { get; set; }
         public decimal TotalGrossAmount
