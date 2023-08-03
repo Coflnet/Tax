@@ -24,13 +24,16 @@ public class TaxBackgroundService : BackgroundService
         await consumer.Consume<PaymentEvent>(config["KAFKA:PAYMENT_TOPIC:NAME"], async (paymentEvent) =>
         {
             decimal fee;
+            string contactId;
             switch (paymentEvent.PaymentProvider)
             {
                 case "stripe":
                     fee = stripeService.getStripeFeeForBalanceTransaction(paymentEvent.PaymentProviderTransactionId);
+                    contactId = ContactId.Stripe;
                     break;
                 case "paypal":
                     fee = await payPalService.getPayPalFeeForTransaction(paymentEvent.PaymentProviderTransactionId);
+                    contactId = ContactId.PayPal;
                     break;
                 default:
                     throw new NotSupportedException($"payment provider {paymentEvent.PaymentProvider} is not supported");
@@ -39,7 +42,7 @@ public class TaxBackgroundService : BackgroundService
             await taxService.createLexOfficeInvoice(new Voucher()
             {
                 Type = "salesinvoice",
-                VoucherNumber = $"{paymentEvent.ProductId} - {paymentEvent.PaymentMethod}",
+                VoucherNumber = $"{paymentEvent.PaymentProviderTransactionId}",
                 VoucherItems = new List<VoucherItem>(){new VoucherItem(){
                     Amount = (decimal) paymentEvent.PayedAmount,
                     CategoryId = CategoryID.Dienstleistungen,
@@ -47,21 +50,22 @@ public class TaxBackgroundService : BackgroundService
                 }},
                 UseCollectiveContact = true,
                 VoucherDate = paymentEvent.Timestamp,
-                Remark = paymentEvent.ProductId
+                Remark = $"{paymentEvent.PaymentMethod} - {paymentEvent.ProductId}"
             });
+            
             await taxService.createLexOfficeInvoice(new Voucher()
             {
                 Type = "purchaseinvoice",
-                VoucherNumber = $"{paymentEvent.ProductId} - {paymentEvent.PaymentMethod}",
+                VoucherNumber = $"{paymentEvent.PaymentProviderTransactionId}",
                 VoucherItems = new List<VoucherItem>(){new VoucherItem(){
                     Amount = fee,
-                    CategoryId = CategoryID.Dienstleistungen,
+                    CategoryId = CategoryID.DienstleistungsAusgabe,
                     TaxRatePercent = 0,
                 }},
-                // Todo: Use paypal contact
-                UseCollectiveContact = true,
+                UseCollectiveContact = false,
+                ContactId = contactId,
                 VoucherDate = paymentEvent.Timestamp,
-                Remark = paymentEvent.ProductId
+                Remark = $"Transaktionsgebühr"
             });
         }, stoppingToken);
     }
