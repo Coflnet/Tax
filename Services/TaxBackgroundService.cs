@@ -25,6 +25,7 @@ public class TaxBackgroundService : BackgroundService
         {
             decimal fee;
             string contactId;
+            await Task.Delay(TimeSpan.FromMinutes(1));
             switch (paymentEvent.PaymentProvider)
             {
                 case "stripe":
@@ -67,6 +68,8 @@ public class TaxBackgroundService : BackgroundService
                 VoucherDate = paymentEvent.Timestamp,
                 Remark = $"Transaktionsgebühr"
             });
+            Console.WriteLine("Created an Invoice");
+            await Task.Delay(TimeSpan.FromMinutes(10));
         }, stoppingToken);
     }
 }
