@@ -8,6 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<TaxService>();
 builder.Services.AddSingleton<PayPalService>();
 builder.Services.AddSingleton<StripeService>();
+builder.Services.AddHostedService<TaxBackgroundService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
