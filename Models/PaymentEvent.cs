@@ -5,7 +5,7 @@ namespace Tax
         public double PayedAmount { get; set; }
         public string ProductId { get; set; }
         public string UserId { get; set; }
-        public Address Address { get; set; }
+        public Address? Address { get; set; }
         public string FullName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

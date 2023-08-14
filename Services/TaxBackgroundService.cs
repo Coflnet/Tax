@@ -53,7 +53,7 @@ public class TaxBackgroundService : BackgroundService
                 VoucherItems = new List<VoucherItem>(){new VoucherItem(){
                     Amount = (decimal) paymentEvent.PayedAmount,
                     CategoryId = CategoryID.Dienstleistungen,
-                    TaxRatePercent = paymentEvent.Address.CountryCode == "DE" ? 19 : 0,
+                    TaxRatePercent = paymentEvent.Address?.CountryCode == "DE" ? 19 : 0,
                 }},
                 UseCollectiveContact = true,
                 VoucherDate = paymentEvent.Timestamp,
