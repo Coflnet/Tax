@@ -74,6 +74,6 @@ public class TaxBackgroundService : BackgroundService
             });
             logger.LogInformation("Created a purchase Invoice for fees");
             await Task.Delay(TimeSpan.FromMinutes(10));
-        }, stoppingToken);
+        }, stoppingToken, config["KAFKA:PAYMENT_TOPIC:GROUP"] ?? throw new ArgumentNullException("KAFKA:PAYMENT_TOPIC:GROUP"));
     }
 }
