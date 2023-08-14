@@ -8,14 +8,16 @@ public class TaxBackgroundService : BackgroundService
     private readonly TaxService taxService;
     private readonly StripeService stripeService;
     private readonly PayPalService payPalService;
+    private readonly ILogger<TaxBackgroundService> logger;
 
-    public TaxBackgroundService(KafkaConsumer consumer, IConfiguration config, TaxService taxService, StripeService stripeService, PayPalService payPalService)
+    public TaxBackgroundService(KafkaConsumer consumer, IConfiguration config, TaxService taxService, StripeService stripeService, PayPalService payPalService, ILogger<TaxBackgroundService> logger)
     {
         this.consumer = consumer;
         this.config = config;
         this.taxService = taxService;
         this.stripeService = stripeService;
         this.payPalService = payPalService;
+        this.logger = logger;
     }
 
 
@@ -26,6 +28,7 @@ public class TaxBackgroundService : BackgroundService
             decimal fee;
             string contactId;
             await Task.Delay(TimeSpan.FromMinutes(1));
+            logger.LogInformation($"Creating an Invoice for {paymentEvent.PaymentProviderTransactionId}");
             switch (paymentEvent.PaymentProvider)
             {
                 case "stripe":
@@ -53,6 +56,7 @@ public class TaxBackgroundService : BackgroundService
                 VoucherDate = paymentEvent.Timestamp,
                 Remark = $"{paymentEvent.PaymentMethod} - {paymentEvent.ProductId}"
             });
+            logger.LogInformation("Created an Invoice");
 
             await taxService.createLexOfficeInvoice(new Voucher()
             {
@@ -68,7 +72,7 @@ public class TaxBackgroundService : BackgroundService
                 VoucherDate = paymentEvent.Timestamp,
                 Remark = $"Transaktionsgebühr"
             });
-            Console.WriteLine("Created an Invoice");
+            logger.LogInformation("Created a purchase Invoice for fees");
             await Task.Delay(TimeSpan.FromMinutes(10));
         }, stoppingToken);
     }
