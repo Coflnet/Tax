@@ -1,4 +1,5 @@
 using Coflnet.Kafka;
+using Newtonsoft.Json;
 using Tax;
 
 public class TaxBackgroundService : BackgroundService
@@ -25,6 +26,7 @@ public class TaxBackgroundService : BackgroundService
     {
         await consumer.Consume<PaymentEvent>(config["KAFKA:PAYMENT_TOPIC:NAME"], async (paymentEvent) =>
         {
+            Console.WriteLine($"PaymentEvent: {JsonConvert.SerializeObject(paymentEvent)}");
             decimal fee;
             string contactId;
             await Task.Delay(TimeSpan.FromMinutes(1));
@@ -42,6 +44,7 @@ public class TaxBackgroundService : BackgroundService
                 default:
                     throw new NotSupportedException($"payment provider {paymentEvent.PaymentProvider} is not supported");
             }
+            Console.WriteLine($"Loaded fee: {fee}");
 
             await taxService.createLexOfficeInvoice(new Voucher()
             {
