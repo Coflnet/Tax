@@ -64,7 +64,7 @@ public class TaxBackgroundService : BackgroundService
             await taxService.createLexOfficeInvoice(new Voucher()
             {
                 Type = "purchaseinvoice",
-                VoucherNumber = $"{paymentEvent.PaymentProviderTransactionId}",
+                VoucherNumber = $"{paymentEvent.PaymentProviderTransactionId}_fee",
                 VoucherItems = new List<VoucherItem>(){new VoucherItem(){
                     Amount = fee,
                     CategoryId = CategoryID.DienstleistungsAusgabe,
