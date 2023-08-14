@@ -3,7 +3,7 @@ using Coflnet.Core;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-//builder.Services.AddCoflnetCore();
+builder.Services.AddCoflnetCore();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<TaxService>();
 builder.Services.AddSingleton<PayPalService>();

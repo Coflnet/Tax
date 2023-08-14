@@ -1,9 +1,6 @@
 using System.Globalization;
 using System.Text;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
-using Tax;
 
 public class PayPalService
 {
